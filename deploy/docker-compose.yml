@@ -19,6 +19,27 @@ services:
       timeout: 5s
       retries: 5
 
+  api:
+    build:
+      context: ../api
+      dockerfile: Dockerfile
+    container_name: api-nestjs
+    restart: always
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "3005:3005"
+    environment:
+      PORT: 3005
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: postgres
+      POSTGRES_PASS: postgres
+      POSTGRES_DB: artworks_db
+    networks:
+      - app-network
+
 volumes:
   postgres_data:
 
