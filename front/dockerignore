@@ -1,0 +1,21 @@
+# Dependências e artefatos locais
+node_modules/
+dist/
+build/
+coverage/
+
+# Git e configs locais
+.git/
+.gitignore
+
+# Docker/Compose e afins
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+
+# Variáveis de ambiente
+.env
+
+# Outros
+*.log
+README.md
