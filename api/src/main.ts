@@ -1,0 +1,31 @@
+import { NestFactory } from '@nestjs/core';
+import { ValidationPipe } from '@nestjs/common';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { AppModule } from './app.module';
+
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule);
+
+  app.enableCors();
+
+  app.useGlobalPipes(
+    new ValidationPipe({
+      transform: true,
+      whitelist: true,
+      forbidNonWhitelisted: true,
+    }),
+  );
+
+  const config = new DocumentBuilder()
+    .setTitle('API Obras de Arte')
+    .setDescription('API desenvolvida para a avaliação de DevOps')
+    .setVersion('1.0')
+    .addTag('Artworks', 'Gestão de obras de arte')
+    .build();
+
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('swagger', app, document);
+
+  await app.listen(Number(process.env.PORT) || 3005);
+}
+bootstrap();
