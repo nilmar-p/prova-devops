@@ -11,6 +11,7 @@ a aplicação cadastra e gerencia obras de arte
 * [Dados](#dados)
 * [Requisitos](#requisitos)
 * [Executando o projeto](#executando-o-projeto)
+* [Banco de dados (PostgreSQL)](#banco-de-dados-postgresql)
 * [Endpoints](#endpoints)
 * [Exemplos de resposta](#exemplos-de-resposta)
 * [Derrubando os recursos](#derrubando-os-recursos)
@@ -170,6 +171,57 @@ Para remover também o volume do banco (apaga os dados):
 ```bash
 docker compose -f deploy/docker-compose.yml down -v
 ```
+
+## Banco de dados (PostgreSQL)
+
+O Postgres sobe via Compose (`postgres:16-alpine`) com:
+
+| Item | Valor |
+| ---- | ----- |
+| Usuário | `postgres` |
+| Senha | `postgres` |
+| Banco | `artworks_db` |
+| Porta externa | `5433` (container: `5432`) |
+| Volume | `postgres_data` (nomeado, persiste os dados) |
+
+Subir só o banco:
+
+```bash
+docker compose -f deploy/docker-compose.yml up -d postgres
+docker compose -f deploy/docker-compose.yml ps
+```
+
+Acessar o banco:
+
+```bash
+# por dentro do container
+docker exec -it postgres psql -U postgres -d artworks_db
+
+# pela máquina (precisa do psql instalado)
+psql -h localhost -p 5433 -U postgres -d artworks_db
+```
+
+Testar a persistência:
+
+```bash
+docker exec -it postgres psql -U postgres -d artworks_db -c "CREATE TABLE teste (id int);"
+docker compose -f deploy/docker-compose.yml down
+docker compose -f deploy/docker-compose.yml up -d postgres
+docker exec -it postgres psql -U postgres -d artworks_db -c "\dt"   # a tabela continua lá
+```
+
+Ver o volume e apagar os dados (só se quiser zerar o banco):
+
+```bash
+docker volume ls
+docker compose -f deploy/docker-compose.yml down -v
+```
+
+### Arquivos de ignore
+
+* `.gitignore` (raiz): não versiona `node_modules`, `dist`, `.env`, logs e arquivos de IDE.
+* `api/.dockerignore` e `front/.dockerignore`: tiram `node_modules`, `.git`, `.env`, Dockerfile e logs do contexto de build, deixando o build mais rápido e sem vazar segredos.
+
 
 ## GitHub
 
