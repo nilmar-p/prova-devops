@@ -15,6 +15,7 @@ a aplicação cadastra e gerencia obras de arte
 * [API (NestJS)](#api-nestjs)
 * [Endpoints](#endpoints)
 * [Exemplos de resposta](#exemplos-de-resposta)
+* [Front (React)](#front-react)
 * [Derrubando os recursos](#derrubando-os-recursos)
 * [GitHub](#github)
 
@@ -302,6 +303,51 @@ curl -X DELETE http://localhost:3005/artworks/1
   "error": "Bad Request",
   "statusCode": 400
 }
+```
+
+## Front (React)
+
+O front foi feito em React (com Vite) e mostra uma tabela com todas as obras que vêm do `GET /artworks` da api.
+
+* Porta: `3000` (http://localhost:3000)
+* No Docker, o build do React é servido por um nginx
+
+### Como o front fala com a api
+
+O navegador não enxerga o nome `api` da network do Docker, então o front chama o caminho `/api/artworks`. O nginx do container do front pega esse pedido e manda para `http://api:3005/artworks`, usando o DNS interno da network `app-network`:
+
+```text
+navegador -> localhost:3000/api/artworks -> nginx (front) -> http://api:3005/artworks
+```
+
+Isso fica configurado no arquivo `front/nginx.conf`.
+
+### Ver a tabela funcionando
+
+Com tudo de pé (`docker compose -f deploy/docker-compose.yml up -d --build`), é só abrir http://localhost:3000. Se a tabela aparecer vazia, cadastra uma obra pelo Swagger (http://localhost:3005/swagger) e atualiza a página.
+
+Também dá para testar a comunicação pela network direto no terminal:
+
+```bash
+curl http://localhost:3000/api/artworks
+```
+
+### Build da imagem
+
+O compose já faz o build sozinho, mas dá para fazer na mão:
+
+```bash
+docker build -t artworks-front ./front
+```
+
+### Rodar o front sem o compose
+
+Precisa da api rodando na porta 3005:
+
+```bash
+cd front
+npm install --legacy-peer-deps
+npm run dev
 ```
 
 ## Derrubando os recursos
