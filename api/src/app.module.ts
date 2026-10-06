@@ -16,7 +16,7 @@ import { ArtworksModule } from './artworks/artworks.module';
       password: process.env.POSTGRES_PASS,
       database: process.env.POSTGRES_DB,
       autoLoadEntities: true,
-      synchronize: true, // Não recomendado em produção
+      synchronize: true,
     }),
     ArtworksModule,
   ],
